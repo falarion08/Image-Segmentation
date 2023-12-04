@@ -20,12 +20,11 @@ xlabel('Intensity');
 ylabel('Frequency');
 title('Normalized Histogram');
 
-% Show normalized image
+% Show normalizde i
 subplot(1,3,2)
 imshow(normalizedImg,'InitialMagnification', 800);
 title('Normalized Image');
 
-% Show binary image
 subplot(1,3,3)
 imshow(binaryImage,'InitialMagnification', 800);
 title('Binary Image');
