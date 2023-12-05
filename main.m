@@ -9,26 +9,45 @@ gray_img = im2gray(rgbImage);
 
 % Normalize image
 normalizedImg = abs(gComponent- gray_img) ; 
+% 
+% % Get binary image
+% binaryImage = im2Binary(normalizedImg,6.5,25);
+% 
+% % Show histogram of the normalized image
+% subplot(1,3,1)
+% histogram(normalizedImg,256); 
+% xlabel('Intensity');
+% ylabel('Frequency');
+% title('Normalized Histogram');
+% 
+% % Show normalized image
+% subplot(1,3,2)
+% imshow(normalizedImg,'InitialMagnification', 800);
+% title('Normalized Image');
+% 
+% % Show binary image
+% subplot(1,3,3)
+% imshow(binaryImage,'InitialMagnification', 800);
+% title('Binary Image');
 
-% Get binary image
-binaryImage = im2Binary(normalizedImg,6.5,25);
+% Convert rgb image to hsv image
+hsvImage = rgb2hsv(rgbImage);
 
-% Show histogram of the normalized image
+% Show input image
 subplot(1,3,1)
-histogram(normalizedImg,256); 
-xlabel('Intensity');
-ylabel('Frequency');
-title('Normalized Histogram');
+imshow(rgbImage);
+title('input image')
 
-% Show normalized image
+% Show HSV image
 subplot(1,3,2)
-imshow(normalizedImg,'InitialMagnification', 800);
-title('Normalized Image');
+imshow(hsvImage);
+title('HSV Image')
 
-% Show binary image
 subplot(1,3,3)
-imshow(binaryImage,'InitialMagnification', 800);
-title('Binary Image');
+newImage = hsvGreen(hsvImage); 
+imshow(newImage);
+title('Binarized HSV Image');
+
 
 
 % Global Thresholding of grayscale image
@@ -44,6 +63,35 @@ function binarizedImage = im2Binary(img, T_lower, T_upper)
                 binarizedImage(i,j) = 255;
             else
                 binarizedImage(i,j)= 0;
+            end
+        end
+    end
+end
+
+function img = hsvGreen(hsvImage)
+    % Create a black image
+    img = zeros(size(hsvImage));
+    imgShape = size(img);
+
+    rows = imgShape(1);
+    cols = imgShape(2);
+
+    % Declare thresholds 
+    saturationT = 0.15; 
+    valueT = 0.30;
+    GreenHueLower= 62 / 360;
+    GreenHueUpper = 135 / 360;
+
+    for(i=1:rows)
+        for(j=1:cols)
+            % Store hsv value of a pixel
+            hue = hsvImage(i,j,1);
+            sat = hsvImage(i,j,2);
+            val = hsvImage(i,j,3);
+
+            % Set image to white if it's within the threshold values
+            if(hue >= GreenHueLower && hue <= GreenHueUpper && hsvImage(i,j,2) >= saturationT && sat >= 0.16 && val >= valueT)
+                img(i,j,:) = 255;
             end
         end
     end
