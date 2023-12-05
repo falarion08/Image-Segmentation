@@ -7,8 +7,8 @@ gComponent = rgbImage(:,:,2);
 %Convert RGB image to grayscale image
 gray_img = im2gray(rgbImage);
 
-% Normalize image
-normalizedImg = abs(gComponent- gray_img) ; 
+% % Normalize image
+% normalizedImg = abs(gComponent- gray_img) ; 
 % 
 % % Get binary image
 % binaryImage = im2Binary(normalizedImg,6.5,25);
@@ -24,29 +24,52 @@ normalizedImg = abs(gComponent- gray_img) ;
 % subplot(1,3,2)
 % imshow(normalizedImg,'InitialMagnification', 800);
 % title('Normalized Image');
-% 
-% % Show binary image
-% subplot(1,3,3)
-% imshow(binaryImage,'InitialMagnification', 800);
-% title('Binary Image');
+
+% Show binary image
+subplot(1,3,3)
+imshow(binaryImage,'InitialMagnification', 800);
+title('Binary Image');
 
 % Convert rgb image to hsv image
 hsvImage = rgb2hsv(rgbImage);
 
-% Show input image
-subplot(1,3,1)
-imshow(rgbImage);
-title('input image')
 
-% Show HSV image
-subplot(1,3,2)
-imshow(hsvImage);
-title('HSV Image')
+%Show histograms for HSV
+% subplot(1,3,1)
+% histogram(hsvImage(:,:,1),50)
+% title('Hue Histogram');
+% xlabel('Hue');
+% ylabel('Frequency');
+% 
+% subplot(1,3,2)
+% histogram(hsvImage(:,:,2),100)
+% title('Saturation Histogram')
+% xlabel('Hue');
+% ylabel('Frequency');
+% 
+% subplot(1,3,3)
+% histogram(hsvImage(:,:,3),100)
+% title('Value Histogram')
+% xlabel('Value');
+% ylabel('Frequency');
 
-subplot(1,3,3)
-newImage = hsvGreen(hsvImage); 
-imshow(newImage);
-title('Binarized HSV Image');
+
+% % Show input image
+% subplot(1,3,1)
+% imshow(rgbImage);
+% title('input image')
+% 
+% % Show HSV image
+% subplot(1,3,2)
+% imshow(hsvImage);
+% title('HSV Image')
+% 
+% % SHow binarized image
+% subplot(1,3,3)
+% newImage = hsvGreen(hsvImage); 
+% imshow(newImage);
+% title('Binarized HSV Image');
+
 
 
 
