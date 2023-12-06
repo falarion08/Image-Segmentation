@@ -1,26 +1,91 @@
-function smoothedTrackList = smoothTrajectories(trackList)
-    smoothedTrackList = cell(size(trackList));
+for i = 1:6
+    imgPath = sprintf('images/img%d.png', i);
+    trackPath = sprintf('tracklists/trackList%d.mat', i);
+    outputPath = sprintf('outputList%d.mat', i);
 
-    for tid = 1:length(trackList)
-        tracklet = trackList{tid};
-        smoothedTracklet = cell(size(tracklet));
+    img = imread(imgPath); % Plot background image
+    load(trackPath); % Load TrackList file
+    trackList = TrackList;
+    
+    windowSize = 3; % Filter window size
+    
+    % Plot original values
+    plotTrack(trackList, 'Original tracking', img, 'blue')
+    
+    % Create modified output
+    outputList = smoothTrack(trackList, windowSize);
+    
+    % Plot smoothened values
+    plotTrack(outputList, 'Smoothened tracking', img, 'green')
+    
+    % Save output as MAT file
+    save(outputPath, 'outputList');
+end
 
-        for blobNum = 1:length(tracklet)
-            blob = tracklet{blobNum};
-            % Assuming blob is a struct with fields x, y, frameNum, etc.
-            
-            % Smooth x and y coordinates using a moving average
-            smoothFactor = 5; % Adjust this based on your requirement
-            smoothedX = smoothdata(blob.x, 'movmean', smoothFactor);
-            smoothedY = smoothdata(blob.y, 'movmean', smoothFactor);
+function plotTrack(trackList, name, img, clr)
+    figure
+    imshow(img);
+    title(name);
+    hold on
+    for i = 1:length(trackList)
+        object = trackList{i};
+        xList = zeros(1, length(object));
+        yList = zeros(1, length(object));
 
-            % Update the blob with smoothed coordinates
-            blob.x = smoothedX;
-            blob.y = smoothedY;
-
-            smoothedTracklet{blobNum} = blob;
+        % Fetch x, y values
+        for j = 1:length(object)
+            blob = object{j}; % blob = [position, frame, class]
+            position = blob{1}; % position = [x, y, w, h]
+            xVal = double(position(1));
+            yVal = double(position(2));
+            xList(j) = xVal + 20; 
+            yList(j) = yVal + 20; 
         end
 
-        smoothedTrackList{tid} = smoothedTracklet;
+        plot(xList, yList, '-', 'Color', clr); % Add to plot
+    end
+    hold off
+end
+
+function outputList = smoothTrack(trackList, windowSize)
+    outputList = cell(1, length(trackList)); % Allocate output memory
+
+    % Iterate through all objects
+    for i = 1:length(trackList)
+        % Allocate memory
+        object = trackList{i};
+        objOut = cell(1, length(object));
+        xList = zeros(1, length(object));
+        yList = zeros(1, length(object));
+
+        % Fetch tracklet x, y values
+        for j = 1:length(object)
+            blob = object{j}; % blob = [position, frame, class]
+            position = blob{1}; % position = [x, y, w, h]
+            xList(j) = double(position(1));
+            yList(j) = double(position(2));
+        end
+
+        % Apply Moving mean filter
+        xSmooth = round(movmean(xList, windowSize));
+        ySmooth = round(movmean(yList, windowSize));
+
+        % Overwrite original x, y values
+        for j = 1:length(object)
+            blob = object{j}; % blob = [position, frame, class]
+
+            position = blob{1}; % position = [x, y, w, h]
+            frame = blob{2};
+            class = blob{3};
+
+            % Overwrite x, y values with filtered values
+            position(1) = int64(xSmooth(j));
+            position(2) = int64(ySmooth(j));
+
+            % Append as cell array
+            objOut{j} = {position, frame, class};
+        end
+        % Append to output as cell array
+        outputList{i} = objOut;
     end
 end
